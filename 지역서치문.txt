@@ -1,0 +1,84 @@
+
+select * from category;
+
+select * from userinfo;
+
+select * from studymember;
+
+select * from category;
+
+select * from studyroom;
+
+select * from notify;
+
+select * from location; 
+
+
+대분류
+
+select * 
+from studyroom r , subcategory s , category c
+where r.subjectcode = s.subjectcode and s.categorycode = c.categorycode
+and c.categorycode = 1;
+
+대분류 + 소분류
+
+select * 
+from studyroom r , studymember m , subcategory s
+where r.studyno = m.studyno and r.subjectcode = s.subjectcode
+and s.subjectcode = 11;
+
+도,시
+
+select *
+from studyroom r , location l
+where r.locationcode(+) = l.locationcode
+and r.locationcode like '11%';
+
+도,시 + 시,군,구
+
+select *
+from location
+where loc1 = '서울특별시' and loc2 = '용산구'
+and locationcode like '%000000'
+
+대분류 + 도,시
+
+select * 
+from studyroom r , subcategory s , category c , location l
+where r.subjectcode = s.subjectcode 
+and s.categorycode = c.categorycode 
+and r.locationcode = l.locationcode
+and c.categorycode = 1
+and r.locationcode like '11%';
+
+대분류 + 도,시 + 시,군,구
+
+select *
+from studyroom r, subcategory s , category c , location l
+where r.locationcode = l.locationcode
+and r.subjectcode = s.subjectcode
+and s.categorycode = c.categorycode
+and c.categorycode = '1'
+and l.loc1 = '서울특별시' and l.loc2= '강남구'
+
+
+대분류 + 소분류 + 도,시
+
+select *
+from studyroom r, subcategory s , category c , location l
+where r.locationcode = l.locationcode
+and r.subjectcode = s.subjectcode
+and s.categorycode = c.categorycode
+and s.subjectcode = 11
+and l.loc1 = '대구광역시'
+
+대분류 + 소분류 + 도,시 + 시,군,구
+
+select *
+from studyroom r, subcategory s , category c , location l
+where r.locationcode = l.locationcode
+and r.subjectcode = s.subjectcode
+and s.categorycode = c.categorycode
+and s.subjectcode = 32
+and l.loc1 = '서울특별시' and l.loc2= '도봉구'

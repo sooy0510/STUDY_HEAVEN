@@ -1,0 +1,151 @@
+sqlplus study/1234@70.12.115.55:1521/xe
+
+sqlplus system/1234
+
+drop table USERINFO cascade constraint;
+drop table USERINFO ;
+CREATE TABLE USERINFO (
+	userid VARCHAR2(50) CONSTRAINT userinfo_pk PRIMARY KEY ,
+	username VARCHAR2(50) NOT NULL ,
+	userpw VARCHAR2(50)  NOT NULL,
+	email VARCHAR2(50) ,
+	address VARCHAR2(50),
+	phone VARCHAR2(50)
+	);	
+
+	
+insert into userinfo values ('admin', '관리자', 'a1234', '', '', '');
+insert into userinfo values ('thor', '토르', '1234', 'thor@as.com', '아스가르드 궁전', '010-1313-1313');
+insert into userinfo values ('ironman', '아맨', '1234', 'ir@ny.com', '뉴욕', '010-1919-7373');
+	
+drop table CATEGORY;
+CREATE TABLE CATEGORY (
+	categorycode NUMBER CONSTRAINT category_pk PRIMARY KEY ,
+	categoryname VARCHAR2(50)  NOT NULL
+	);	
+
+insert into category values (1, '영어');
+insert into category values (2, '일본어');
+insert into category values (3, '중국어');
+insert into category values (4, '취업');
+insert into category values (5, '코딩');
+insert into category values (6, '기타');
+
+delete from category;
+
+insert into category values (1, 'english');
+insert into category values (2, 'japanese');
+insert into category values (3, 'chinese');
+insert into category values (4, 'job');
+insert into category values (5, 'coding');
+insert into category values (6, 'etc');
+
+
+alter table 
+	
+drop table SUBCATEGORY;
+CREATE TABLE SUBCATEGORY (
+	subjectcode NUMBER CONSTRAINT subcategory_pk PRIMARY KEY ,
+	categorycode NUMBER REFERENCES category(categorycode),
+	subjectname VARCHAR2(50) NOT NULL
+	);	
+
+insert into subcategory values (11,1, 'TOEIC');
+insert into subcategory values (12,1, 'OPIC');
+insert into subcategory values (13,1, 'TOEIC-SPEAKING');
+insert into subcategory values (14,1, 'TEPS');
+insert into subcategory values (15,1, 'TOEFL');
+insert into subcategory values (16,1, 'G-TELP');
+insert into subcategory values (17,1, 'GRE');
+
+insert into subcategory values (21,2, 'JLPT');
+insert into subcategory values (22,2, 'JPT');
+insert into subcategory values (23,2, 'SJPT');
+insert into subcategory values (24,2, 'FLEX');
+insert into subcategory values (25,2, 'BJT');
+insert into subcategory values (26,2, 'OPIC');
+
+insert into subcategory values (31,3, 'HSK');
+insert into subcategory values (32,3, 'BCT');
+insert into subcategory values (33,3, 'FLEX');
+insert into subcategory values (34,3, 'OPIC');
+insert into subcategory values (35,3, '新HSK');
+
+insert into subcategory values (41,4, '인적성');
+insert into subcategory values (42,4, '자기소개서');
+insert into subcategory values (43,4, '면접');
+
+insert into subcategory values (51,5, '알고리즘');
+insert into subcategory values (52,5, '공모전');
+
+insert into subcategory values (61,6, '자율');
+insert into subcategory values (62,6, '취미');
+
+select c.categoryname, s.subjectcode, c.categorycode, s.subjectname
+ from category c, subcategory s 
+ where s.categorycode = c.categorycode;
+
+drop table LOCATION;
+CREATE TABLE LOCATION (
+	locationcode NUMBER CONSTRAINT location_pk PRIMARY KEY ,
+	loc1 VARCHAR2(25),
+	loc2 VARCHAR2(20),
+	loc3 VARCHAR2(20)
+	);	
+	
+drop table STUDYROOM;
+CREATE TABLE STUDYROOM (
+	studyno NUMBER CONSTRAINT study_pk PRIMARY KEY,
+	studytitle VARCHAR2(50) NOT NULL,
+	subjectcode NUMBER REFERENCES subcategory(subjectcode),
+	membercnt NUMBER default 0,
+	locationcode NUMBER REFERENCES location(locationcode),
+	managerid VARCHAR2(50) REFERENCES userinfo(userid),
+	regdate Date DEFAULT SYSDATE,
+	state VARCHAR2(2) CONSTRAINTS state_ck CHECK ( state IN ('0', '1')) ,
+	content VARCHAR2(3000),
+	viewcnt NUMBER default 0
+	);
+
+ALTER TABLE studyroom MODIFY (state DEFAULT '0') ;
+	
+
+insert into studyroom 
+(studyno, studytitle, subjectcode, membercnt, locationcode, managerid, state, content) values 
+((select nvl(max(studyno),0)+1 from studyroom),
+'함께해요~ 토익', 11, 5, 5011025600 , 'thor', '0' , '열심히 하세요' );
+
+insert into STUDYROOM 
+(studyno, studytitle, subjectcode, membercnt, locationcode, managerid, content) values 
+((select nvl(max(studyno),0)+1 from studyroom),
+'함께해요~ 토익!', 11, 5, 5011025600 , 'ironman' , '열심히 하세요!!' );
+
+drop table STUDYMEMBER;
+CREATE TABLE STUDYMEMBER (
+	studyno NUMBER REFERENCES studyroom(studyno),
+	userid VARCHAR2(50) REFERENCES userinfo(userid),
+	status VARCHAR2(1) CONSTRAINTS status_ck CHECK ( status IN ('0', '1'))
+	);
+	
+insert into studymember values (1,'thor','0');
+insert into studymember values (1,'ironman','1');
+
+insert into studymember values (2,'ironman','0');
+insert into studymember values (2,'thor','1');
+
+
+drop table NOTIFY;
+CREATE TABLE NOTIFY (
+	seq NUMBER CONSTRAINT notify_pk PRIMARY KEY ,
+	userid VARCHAR2(50) REFERENCES userinfo(userid),
+	target_userid VARCHAR2(50) REFERENCES userinfo(userid),
+	notifytype VARCHAR2(50),
+	studyno NUMBER REFERENCES studyroom(studyno),
+	notifydate Date DEFAULT SYSDATE,
+	notifycheck VARCHAR2(2) CONSTRAINTS notify_ck CHECK ( notifycheck IN ('0', '1'))
+	);	
+	
+
+	
+	
+	SELECT * FROM (SELECT studyno FROM studyroom ORDER BY studyno DESC) WHERE ROWNUM = 1;
